@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101713">
+<title>Yassin Football</title>
+<style>
+:root{color-scheme:dark;--bg:#101713;--panel:#1b2921;--panel2:#21352a;--green:#31c878;--muted:#a6c9b2;--white:#f4fff7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+header{padding:22px 18px 14px;background:linear-gradient(135deg,#173c29,#101713)}
+.brand{font-size:24px;font-weight:900;letter-spacing:.3px}.sub{color:var(--muted);font-size:13px;margin-top:3px}
+.wrap{max-width:760px;margin:auto;padding:14px}
+.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 18px}
+button,select{font:inherit}button{border:0;border-radius:12px;padding:11px 8px;background:var(--panel2);color:var(--white);font-weight:700;cursor:pointer}
+button.active{background:var(--green);color:#082012}
+h2{font-size:18px;margin:18px 0 10px}.muted{color:var(--muted);font-size:13px}
+.filters{display:flex;gap:8px;overflow:auto;padding-bottom:7px}
+.filters button{white-space:nowrap}.league-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.league{padding:14px;text-align:right;background:var(--panel);border:1px solid #2d4537}
+.league.selected{outline:2px solid var(--green)}
+.card{background:var(--panel);border:1px solid #2d4537;border-radius:15px;padding:14px;margin:9px 0}
+.meta{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;margin-bottom:12px}
+.live{color:#ff7777;font-weight:800}.teams{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;text-align:center;gap:8px;font-weight:800}
+.score{font-size:24px;direction:ltr}.small{font-size:12px;color:var(--muted);text-align:center;margin-top:9px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.toggle{width:48px;height:28px;border-radius:20px;background:#52645a;position:relative;flex:none}
+.toggle:after{content:"";position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:white;transition:.15s}
+.toggle.on{background:var(--green)}.toggle.on:after{right:24px}
+.team-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.team{display:flex;justify-content:space-between;align-items:center;background:var(--panel);padding:12px;border-radius:12px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:22px}
+.notice{background:#3c321c;border:1px solid #806b2e;color:#ffe6a1;padding:12px;border-radius:12px;font-size:12px;line-height:1.7}
+.hidden{display:none}
+@media(max-width:420px){.nav button{font-size:12px;padding:10px 4px}.brand{font-size:21px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="brand">⚽ YASSIN FOOTBALL</div><div class="sub">كل الكورة في مكان واحد</div></div></header>
+<main class="wrap">
+<div class="nav">
+<button class="active" data-page="matches">المباريات</button>
+<button data-page="leagues">الدوريات</button>
+<button data-page="teams">فِرَقي</button>
+<button data-page="alerts">الإشعارات</button>
+</div>
+
+<section id="matches">
+<h2>المباريات</h2>
+<div class="filters">
+<button class="active" data-filter="all">الكل</button>
+<button data-filter="live">🔴 مباشر</button>
+<button data-filter="upcoming">القادمة</button>
+<button data-filter="finished">انتهت</button>
+</div>
+<div id="matchList"></div>
+<div class="notice">تنبيه: دي بيانات تجريبية للتصميم فقط، وليست نتائج أو مواعيد حقيقية. ربط النتائج المباشرة يحتاج مصدر بيانات موثوق ومفتاح API.</div>
+</section>
+
+<section id="leagues" class="hidden">
+<h2>الدوريات والبطولات</h2>
+<div class="league-grid" id="leagueGrid"></div>
+<div id="leagueDetails"></div>
+</section>
+
+<section id="teams" class="hidden">
+<h2>الفرق المفضلة</h2><p class="muted">اختار الفرق اللي تحب تتابعها. اختيارك بيتحفظ على نفس الموبايل.</p>
+<div class="team-list" id="teamList"></div>
+</section>
+
+<section id="alerts" class="hidden">
+<h2>إعدادات الإشعارات</h2>
+<div class="card">
+<div class="row"><div><b>بداية المباراة</b><div class="muted">لما المباراة تبدأ</div></div><button class="toggle on" aria-label="تبديل"></button></div>
+</div>
+<div class="card">
+<div class="row"><div><b>الأهداف</b><div class="muted">لما فريقك المفضل يسجل</div></div><button class="toggle on" aria-label="تبديل"></button></div>
+</div>
+<div class="card">
+<div class="row"><div><b>نهاية المباراة</b><div class="muted">النتيجة النهائية</div></div><button class="toggle on" aria-label="تبديل"></button></div>
+</div>
+<div class="card">
+<div class="row"><div><b>تذكير قبل المباراة</b><div class="muted">قبل البداية بـ 15 دقيقة</div></div><button class="toggle" aria-label="تبديل"></button></div>
+</div>
+<div class="notice">مفاتيح الإشعارات هنا تحفظ اختيارك داخل النموذج فقط. إرسال إشعارات حقيقية للموبايل يحتاج نسخة أندرويد وخدمة إشعارات متصلة بالإنترنت.</div>
+</section>
+<footer>Yassin Football · نموذج أولي 0.3</footer>
+</main>
+<script>
+const matches=[
+ {league:"الدوري المصري",home:"الأهلي",away:"الزمالك",score:"2 - 1",status:"live",label:"مباشر · مثال تجريبي"},
+ {league:"الدوري الإنجليزي",home:"ليفربول",away:"مانشستر سيتي",score:"1 - 1",status:"live",label:"مباشر · مثال تجريبي"},
+ {league:"دوري أبطال أوروبا",home:"ريال مدريد",away:"بايرن ميونخ",score:"20:00",status:"upcoming",label:"موعد تجريبي"},
+ {league:"الدوري الإسباني",home:"برشلونة",away:"أتلتيكو مدريد",score:"انتهت 2 - 0",status:"finished",label:"نتيجة تجريبية"}
+];
+const leagues=["دوري أبطال أوروبا","الدوري المصري","الدوري الإنجليزي","الدوري الإسباني","الدوري الإيطالي","الدوري السعودي"];
+const teams=["الأهلي","الزمالك","ريال مدريد","برشلونة","ليفربول","مانشستر سيتي"];
+const leagueInfo={"دوري أبطال أوروبا":["ريال مدريد","بايرن ميونخ","برشلونة","مانشستر سيتي"],"الدوري المصري":["الأهلي","الزمالك","بيراميدز","المصري"],"الدوري الإنجليزي":["ليفربول","مانشستر سيتي","أرسنال","تشيلسي"],"الدوري الإسباني":["ريال مدريد","برشلونة","أتلتيكو مدريد","جيرونا"],"الدوري الإيطالي":["إنتر","ميلان","يوفنتوس","نابولي"],"الدوري السعودي":["الهلال","النصر","الاتحاد","الأهلي"]};
+let favorites=JSON.parse(localStorage.getItem("yf_favorites")||"[]");
+let filter="all",selectedLeague=leagues[0];
+function renderMatches(){document.getElementById("matchList").innerHTML=matches.filter(m=>filter==="all"||m.status===filter).map(m=>`<article class="card"><div class="meta"><span>${m.league}</span><span class="${m.status==="live"?"live":""}">${m.status==="live"?"🔴 "+m.label:m.label}</span></div><div class="teams"><span>${m.home}</span><span class="score">${m.score}</span><span>${m.away}</span></div></article>`).join("")||'<p class="muted">مفيش مباريات في القسم ده في النموذج التجريبي.</p>'}
+document.querySelectorAll("[data-filter]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-filter]").forEach(x=>x.classList.remove("active"));b.classList.add("active");filter=b.dataset.filter;renderMatches()}));
+document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-page]").forEach(x=>x.classList.remove("active"));b.classList.add("active");["matches","leagues","teams","alerts"].forEach(id=>document.getElementById(id).classList.toggle("hidden",id!==b.dataset.page))}));
+document.getElementById("leagueGrid").innerHTML=leagues.map(l=>`<button class="league ${l===selectedLeague?"selected":""}" data-league="${l}">🏆 ${l}</button>`).join("");
+function showLeague(name){selectedLeague=name;document.querySelectorAll("[data-league]").forEach(x=>x.classList.toggle("selected",x.dataset.league===selectedLeague));const clubs=leagueInfo[name]||[];document.getElementById("leagueDetails").innerHTML=`<div class="card"><b>🏆 ${name}</b><h2>الفرق المشاركة</h2>${clubs.map((t,i)=>`<div class="row" style="padding:8px 0;border-bottom:1px solid #2d4537"><span>${i+1}. ${t}</span><span class="muted">الترتيب التجريبي</span></div>`).join("")}<p class="muted">سيتم عرض جدول حقيقي والمباريات القادمة والهدافين عند ربط مصدر بيانات البطولة.</p></div>`;}
+document.querySelectorAll("[data-league]").forEach(b=>b.addEventListener("click",()=>showLeague(b.dataset.league)));
+showLeague(selectedLeague);
+function renderTeams(){document.getElementById("teamList").innerHTML=teams.map(t=>`<div class="team"><b>${t}</b><button class="toggle ${favorites.includes(t)?"on":""}" data-team="${t}" aria-label="متابعة ${t}"></button></div>`).join("");document.querySelectorAll("[data-team]").forEach(b=>b.addEventListener("click",()=>{const t=b.dataset.team;favorites=favorites.includes(t)?favorites.filter(x=>x!==t):[...favorites,t];localStorage.setItem("yf_favorites",JSON.stringify(favorites));renderTeams();}));}
+renderTeams();
+document.querySelectorAll("#alerts .toggle").forEach((b,i)=>{const key="yf_alert_"+i;b.classList.toggle("on",localStorage.getItem(key)!=="false");b.addEventListener("click",()=>{b.classList.toggle("on");localStorage.setItem(key,b.classList.contains("on")?"true":"false")})});
+renderMatches();
+</script>
+</body></html>
